@@ -93,11 +93,12 @@ private:
 
 	void _updateGUI();
 
-	void on_Btn_Do_clicked();
-	
-	void on_Btn_Set_clicked();
+	void _initTableView();
+
+	void _initReturnActionCBBOX();
+
 	void _setHintHand(int command);
-	void _setExerciseHand(int command);
+	void _setExerciseHand(int predict, int idx_prdt);
 	void _clearHintHand();
 
 public slots:
@@ -110,6 +111,7 @@ public slots:
 	void on_Btn_StartExercise_clicked(); // Test
 	void on_Btn_CreateReport_clicked();
 	void on_BtnExportReport_clicked();
+	void on_Btn_ApplyFingerReturn_clicked();
 	
 
 private slots:

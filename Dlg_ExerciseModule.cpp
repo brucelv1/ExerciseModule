@@ -21,8 +21,10 @@ Dlg_ExerciseModule::Dlg_ExerciseModule(unsigned char* nameSharedMem, size_t lenS
 	, _mSingleDuration(6)
 {
 	setupUi(this);
+	_initTableView();
 	qTimer = new QTimer(this);
 	connect(qTimer, SIGNAL(timeout()), this, SLOT(_qTimer_timeout()));
+	_updateGUI();
 }
 
 Dlg_ExerciseModule::~Dlg_ExerciseModule()
@@ -91,7 +93,7 @@ void Dlg_ExerciseModule::_threadSend( Dlg_ExerciseModule* dtm, std::vector<int> 
 		} while (1);
 		
 		// statistics
-		int cnt = 0; dtm->_ucpNameSharedMem[7]=cnt;
+		int cnt = 0;
 		int right = 0;
 		int firstHit = 0;
 		bool has1stHit = false;
@@ -114,7 +116,7 @@ void Dlg_ExerciseModule::_threadSend( Dlg_ExerciseModule* dtm, std::vector<int> 
 			{
 				int predict = dtm->_mClassifier->Predict(dtm->_armBandData);
 				
-				cnt++; dtm->_ucpNameSharedMem[7]=cnt;
+				cnt++;
 				/*if (predict == command)
 				{
 					if (has1stHit==false)
@@ -124,7 +126,7 @@ void Dlg_ExerciseModule::_threadSend( Dlg_ExerciseModule* dtm, std::vector<int> 
 					}
 					right++;
 				}*/
-				dtm->_setExerciseHand(predict);
+				dtm->_setExerciseHand(predict, cnt);
 
 				dtm->_armBandData.clear();
 			}
@@ -163,28 +165,6 @@ void Dlg_ExerciseModule::_qTimer_timeout()
 	//progressBar->setValue(processingBarVal);
 	////std::cout << "process: " << _ucpNameSharedMem[6] << std::endl;
 	////progressBar->setValue(_ucpNameSharedMem[6]);
-}
-
-void Dlg_ExerciseModule::on_Btn_Do_clicked()
-{
-	//int command = spinBox->value();
-	//_ucpNameSharedMem[7]+=1;
-	//_ucpNameSharedMem[8] = command<256 ? 1 : 2; // 1: finger, 2: wrist
-	//// parse command
-	//unsigned char byte0 = command % 256;
-	//unsigned char byte1 = (command >> 8) % 256;
-	//unsigned char byte2 = 0; // not used yet
-	//unsigned char byte3 = 0; // not used yet
-
-	//_ucpNameSharedMem[4] = byte0;
-	//_ucpNameSharedMem[3] = byte1;
-	//_ucpNameSharedMem[2] = byte2; // not used yet
-	//_ucpNameSharedMem[1] = byte3; // not used yet
-}
-
-void Dlg_ExerciseModule::on_Btn_Set_clicked()
-{
-	//_ucpNameSharedMem[9] = spinBoxFingerReturn->value();
 }
 
 void Dlg_ExerciseModule::on_BtnOpenPlugin_clicked()
@@ -237,6 +217,11 @@ void Dlg_ExerciseModule::on_BtnImportConfig_clicked()
 		LEConfigPath->setText(filename);
 		_mTrainConfigPath = filename.toStdString();
 		BtnImportConfig->setEnabled(false);
+
+		// read config file, and generate label vector
+		_parseTrainConfig();
+		// initialize comboBox of return action
+		_initReturnActionCBBOX();
 	}
 }
 
@@ -250,8 +235,7 @@ void Dlg_ExerciseModule::on_BtnImportData_clicked()
 
 	if (!filename.isNull())
 	{
-		// read config file, and generate label vector
-		_parseTrainConfig();
+		// generate the label vector
 		std::vector<int> labelVec;
 		for (size_t i=0; i<_commandVec.size(); i++)
 		{
@@ -348,6 +332,21 @@ void Dlg_ExerciseModule::on_Btn_Connect_clicked()
 
 	// 臂带已经开始正常采集数据
 	LE_Armband_Status->setText("Connection Successful.");
+}
+
+void Dlg_ExerciseModule::on_Btn_ApplyFingerReturn_clicked()
+{
+	QString action = cbBoxReturnAction->currentText();
+	LE_ReturnAction->setText(action);
+
+	for (size_t i=0; i<_commandVec.size(); i++)
+	{
+		if(_commandVec[i]->Name == action.toStdString())
+		{
+			unsigned char cmd = _commandVec[i]->Command % 256;
+			_ucpNameSharedMem[9] = cmd;
+		}
+	}
 }
 
 void Dlg_ExerciseModule::on_Btn_StartExercise_clicked()
@@ -469,6 +468,20 @@ void Dlg_ExerciseModule::_parseTrainConfig()
 	_commandVec = InfoVec;
 }
 
+void Dlg_ExerciseModule::_initTableView()
+{
+	_tableModel->setHorizontalHeaderItem(0,new QStandardItem("Action"));
+	_tableModel->setHorizontalHeaderItem(1,new QStandardItem("Correctness"));
+	_tableModel->setHorizontalHeaderItem(2,new QStandardItem("First Hit Delay"));
+	_tableModel->setHorizontalHeaderItem(3,new QStandardItem("Stability"));
+
+	// bind the model with the view
+	tbView_Report->setModel(_tableModel);
+
+	// set read-only
+	tbView_Report->setEditTriggers(QAbstractItemView::NoEditTriggers);
+}
+
 void Dlg_ExerciseModule::_setHintHand(int command)
 {
 	_ucpNameSharedMem[10] = 1;
@@ -484,11 +497,14 @@ void Dlg_ExerciseModule::_setHintHand(int command)
 	_ucpNameSharedMem[11] = byte3; // not used yet
 }
 
-void Dlg_ExerciseModule::_setExerciseHand( int command )
+void Dlg_ExerciseModule::_setExerciseHand(int predict, int idx_prdt)
 {
+	_ucpNameSharedMem[7] = idx_prdt;
+	_ucpNameSharedMem[8] = predict<256 ? 1 : 2; // 1: finger, 2: wrist
+
 	// parse command
-	unsigned char byte0 = command % 256;
-	unsigned char byte1 = (command >> 8) % 256;
+	unsigned char byte0 = predict % 256;
+	unsigned char byte1 = (predict >> 8) % 256;
 	unsigned char byte2 = 0; // not used yet
 	unsigned char byte3 = 0; // not used yet
 
@@ -501,4 +517,25 @@ void Dlg_ExerciseModule::_setExerciseHand( int command )
 void Dlg_ExerciseModule::_clearHintHand()
 {
 	_ucpNameSharedMem[15] = 1;
+}
+
+void Dlg_ExerciseModule::_initReturnActionCBBOX()
+{
+	std::vector<string> actions;
+	for (size_t i=0; i<_commandVec.size(); i++)
+	{
+		// skip the REST and wrist actions
+		if(_commandVec[i]->Command == 0 || _commandVec[i]->Command >= 256)
+			continue;
+
+		string action = _commandVec[i]->Name;
+		actions.push_back(action);
+	}
+	std::sort(actions.begin(), actions.end());
+	actions.erase(std::unique(actions.begin(), actions.end()),actions.end());
+
+	for (size_t i=0; i<actions.size(); i++)
+	{
+		cbBoxReturnAction->addItem(QString(actions[i].c_str()));
+	}
 }

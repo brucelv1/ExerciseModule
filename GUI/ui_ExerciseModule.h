@@ -57,12 +57,17 @@ public:
     QLabel *label_2;
     QLineEdit *LE_Armband_Status;
     QGroupBox *groupBox_2;
-    QHBoxLayout *horizontalLayout_4;
+    QVBoxLayout *verticalLayout_3;
     QHBoxLayout *horizontalLayout_3;
     QLabel *label_3;
     QSpinBox *spinB_ActionTimes;
     QLabel *label_4;
     QSpinBox *spinB_ActionDuration;
+    QHBoxLayout *horizontalLayout_4;
+    QLabel *label_5;
+    QComboBox *cbBoxReturnAction;
+    QPushButton *Btn_ApplyFingerReturn;
+    QLineEdit *LE_ReturnAction;
     QHBoxLayout *horizontalLayout_12;
     QPushButton *Btn_StartExercise;
     QProgressBar *progressBar;
@@ -212,8 +217,8 @@ public:
 
         groupBox_2 = new QGroupBox(ExerciseModule);
         groupBox_2->setObjectName(QString::fromUtf8("groupBox_2"));
-        horizontalLayout_4 = new QHBoxLayout(groupBox_2);
-        horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
+        verticalLayout_3 = new QVBoxLayout(groupBox_2);
+        verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
         horizontalLayout_3 = new QHBoxLayout();
         horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
         label_3 = new QLabel(groupBox_2);
@@ -241,7 +246,37 @@ public:
         horizontalLayout_3->addWidget(spinB_ActionDuration);
 
 
-        horizontalLayout_4->addLayout(horizontalLayout_3);
+        verticalLayout_3->addLayout(horizontalLayout_3);
+
+        horizontalLayout_4 = new QHBoxLayout();
+        horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
+        label_5 = new QLabel(groupBox_2);
+        label_5->setObjectName(QString::fromUtf8("label_5"));
+
+        horizontalLayout_4->addWidget(label_5);
+
+        cbBoxReturnAction = new QComboBox(groupBox_2);
+        cbBoxReturnAction->setObjectName(QString::fromUtf8("cbBoxReturnAction"));
+
+        horizontalLayout_4->addWidget(cbBoxReturnAction);
+
+        Btn_ApplyFingerReturn = new QPushButton(groupBox_2);
+        Btn_ApplyFingerReturn->setObjectName(QString::fromUtf8("Btn_ApplyFingerReturn"));
+
+        horizontalLayout_4->addWidget(Btn_ApplyFingerReturn);
+
+        LE_ReturnAction = new QLineEdit(groupBox_2);
+        LE_ReturnAction->setObjectName(QString::fromUtf8("LE_ReturnAction"));
+        LE_ReturnAction->setReadOnly(true);
+
+        horizontalLayout_4->addWidget(LE_ReturnAction);
+
+        horizontalLayout_4->setStretch(0, 1);
+        horizontalLayout_4->setStretch(1, 1);
+        horizontalLayout_4->setStretch(2, 1);
+        horizontalLayout_4->setStretch(3, 1);
+
+        verticalLayout_3->addLayout(horizontalLayout_4);
 
 
         verticalLayout_2->addWidget(groupBox_2);
@@ -338,9 +373,11 @@ public:
         );
         Btn_Connect->setText(QApplication::translate("ExerciseModule", "\350\277\236\346\216\245", 0, QApplication::UnicodeUTF8));
         label_2->setText(QApplication::translate("ExerciseModule", "\350\277\236\346\216\245\347\212\266\346\200\201\357\274\232", 0, QApplication::UnicodeUTF8));
-        groupBox_2->setTitle(QApplication::translate("ExerciseModule", "\346\265\213\350\257\225\347\233\270\345\205\263\350\256\276\347\275\256", 0, QApplication::UnicodeUTF8));
+        groupBox_2->setTitle(QApplication::translate("ExerciseModule", "\347\273\203\344\271\240\347\233\270\345\205\263\350\256\276\347\275\256", 0, QApplication::UnicodeUTF8));
         label_3->setText(QApplication::translate("ExerciseModule", "\346\257\217\344\270\252\345\212\250\344\275\234\351\207\215\345\244\215\346\254\241\346\225\260", 0, QApplication::UnicodeUTF8));
         label_4->setText(QApplication::translate("ExerciseModule", "\346\234\200\345\244\247\345\260\235\350\257\225\346\227\266\351\227\264\357\274\232\347\247\222", 0, QApplication::UnicodeUTF8));
+        label_5->setText(QApplication::translate("ExerciseModule", "\350\256\276\345\256\232\345\244\215\344\275\215\345\212\250\344\275\234\357\274\232", 0, QApplication::UnicodeUTF8));
+        Btn_ApplyFingerReturn->setText(QApplication::translate("ExerciseModule", "\345\272\224\347\224\250", 0, QApplication::UnicodeUTF8));
         Btn_StartExercise->setText(QApplication::translate("ExerciseModule", "\345\274\200\345\247\213\347\273\203\344\271\240", 0, QApplication::UnicodeUTF8));
         groupBox_3->setTitle(QApplication::translate("ExerciseModule", "\346\234\254\346\254\241\347\273\203\344\271\240\346\212\245\345\221\212", 0, QApplication::UnicodeUTF8));
         Btn_CreateReport->setText(QApplication::translate("ExerciseModule", "\347\224\237\346\210\220\346\212\245\345\221\212", 0, QApplication::UnicodeUTF8));
