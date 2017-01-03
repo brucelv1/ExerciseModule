@@ -22,7 +22,7 @@ static const uint qt_meta_data_Dlg_ExerciseModule[] = {
        6,       // revision
        0,       // classname
        0,    0, // classinfo
-       4,   14, // methods
+      10,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -31,16 +31,29 @@ static const uint qt_meta_data_Dlg_ExerciseModule[] = {
 
  // slots: signature, parameters, type, tag, flags
       20,   19,   19,   19, 0x0a,
-      40,   19,   19,   19, 0x0a,
-      63,   19,   19,   19, 0x0a,
-      84,   19,   19,   19, 0x08,
+      47,   19,   19,   19, 0x0a,
+      76,   19,   19,   19, 0x0a,
+     103,   19,   19,   19, 0x0a,
+     136,   19,   19,   19, 0x0a,
+     167,   19,   19,   19, 0x0a,
+     192,   19,   19,   19, 0x0a,
+     223,   19,   19,   19, 0x0a,
+     253,   19,   19,   19, 0x0a,
+     282,   19,   19,   19, 0x08,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_Dlg_ExerciseModule[] = {
-    "Dlg_ExerciseModule\0\0on_Btn_Do_clicked()\0"
-    "on_Btn_Clear_clicked()\0on_Btn_Set_clicked()\0"
+    "Dlg_ExerciseModule\0\0on_BtnOpenPlugin_clicked()\0"
+    "on_BtnImportConfig_clicked()\0"
+    "on_BtnImportData_clicked()\0"
+    "on_BtnCreateClassifier_clicked()\0"
+    "on_BtnSaveClassifier_clicked()\0"
+    "on_Btn_Connect_clicked()\0"
+    "on_Btn_StartExercise_clicked()\0"
+    "on_Btn_CreateReport_clicked()\0"
+    "on_BtnExportReport_clicked()\0"
     "_qTimer_timeout()\0"
 };
 
@@ -50,10 +63,16 @@ void Dlg_ExerciseModule::qt_static_metacall(QObject *_o, QMetaObject::Call _c, i
         Q_ASSERT(staticMetaObject.cast(_o));
         Dlg_ExerciseModule *_t = static_cast<Dlg_ExerciseModule *>(_o);
         switch (_id) {
-        case 0: _t->on_Btn_Do_clicked(); break;
-        case 1: _t->on_Btn_Clear_clicked(); break;
-        case 2: _t->on_Btn_Set_clicked(); break;
-        case 3: _t->_qTimer_timeout(); break;
+        case 0: _t->on_BtnOpenPlugin_clicked(); break;
+        case 1: _t->on_BtnImportConfig_clicked(); break;
+        case 2: _t->on_BtnImportData_clicked(); break;
+        case 3: _t->on_BtnCreateClassifier_clicked(); break;
+        case 4: _t->on_BtnSaveClassifier_clicked(); break;
+        case 5: _t->on_Btn_Connect_clicked(); break;
+        case 6: _t->on_Btn_StartExercise_clicked(); break;
+        case 7: _t->on_Btn_CreateReport_clicked(); break;
+        case 8: _t->on_BtnExportReport_clicked(); break;
+        case 9: _t->_qTimer_timeout(); break;
         default: ;
         }
     }
@@ -94,9 +113,9 @@ int Dlg_ExerciseModule::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 4)
+        if (_id < 10)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 4;
+        _id -= 10;
     }
     return _id;
 }

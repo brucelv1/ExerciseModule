@@ -87,13 +87,30 @@ public:
 	~Dlg_ExerciseModule();
 
 private:
+	void _parseTrainConfig();
 
 	static void _threadSend(Dlg_ExerciseModule* dtm, std::vector<int> testSeries);
 
-public slots:
+	void _updateGUI();
+
 	void on_Btn_Do_clicked();
-	void on_Btn_Clear_clicked();
+	
 	void on_Btn_Set_clicked();
+	void _setHintHand(int command);
+	void _setExerciseHand(int command);
+	void _clearHintHand();
+
+public slots:
+	void on_BtnOpenPlugin_clicked();
+	void on_BtnImportConfig_clicked();
+	void on_BtnImportData_clicked();
+	void on_BtnCreateClassifier_clicked();
+	void on_BtnSaveClassifier_clicked();
+	void on_Btn_Connect_clicked();
+	void on_Btn_StartExercise_clicked(); // Test
+	void on_Btn_CreateReport_clicked();
+	void on_BtnExportReport_clicked();
+	
 
 private slots:
 	void _qTimer_timeout();
