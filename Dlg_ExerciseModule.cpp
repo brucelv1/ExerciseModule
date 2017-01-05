@@ -343,7 +343,7 @@ void Dlg_ExerciseModule::on_Btn_ApplyFingerReturn_clicked()
 		if(_commandVec[i]->Name == action.toStdString())
 		{
 			unsigned char cmd = _commandVec[i]->Command % 256;
-			_ucpNameSharedMem[9] = cmd;
+			_ucpNameSharedMem[ByteDef::FINGER_RETURN_COMMAND_BYTE] = cmd;
 		}
 	}
 }
@@ -551,23 +551,23 @@ void Dlg_ExerciseModule::_initTableView()
 
 void Dlg_ExerciseModule::_setHintHand(int command)
 {
-	_ucpNameSharedMem[10] = 1;
+	_ucpNameSharedMem[ByteDef::HINT_HAND_MOVE_BYTE] = 1;
 	// parse command
 	unsigned char byte0 = command % 256;
 	unsigned char byte1 = (command >> 8) % 256;
 	unsigned char byte2 = 0; // not used yet
 	unsigned char byte3 = 0; // not used yet
 
-	_ucpNameSharedMem[14] = byte0;
-	_ucpNameSharedMem[13] = byte1;
-	_ucpNameSharedMem[12] = byte2; // not used yet
-	_ucpNameSharedMem[11] = byte3; // not used yet
+	_ucpNameSharedMem[ByteDef::HINT_HAND_MOVE_BYTE1] = byte0;
+	_ucpNameSharedMem[ByteDef::HINT_HAND_MOVE_BYTE2] = byte1;
+	_ucpNameSharedMem[ByteDef::HINT_HAND_MOVE_BYTE3] = byte2; // not used yet
+	_ucpNameSharedMem[ByteDef::HINT_HAND_MOVE_BYTE4] = byte3; // not used yet
 }
 
 void Dlg_ExerciseModule::_setExerciseHand(int predict, int idx_prdt)
 {
-	_ucpNameSharedMem[7] = idx_prdt;
-	_ucpNameSharedMem[8] = predict<256 ? 1 : 2; // 1: finger, 2: wrist
+	_ucpNameSharedMem[ByteDef::NUM_DECISION_BYTE] = idx_prdt;
+	_ucpNameSharedMem[ByteDef::DECISION_TYPE_BYTE] = predict<256 ? 1 : 2; // 1: finger, 2: wrist
 
 	// parse command
 	unsigned char byte0 = predict % 256;
@@ -583,7 +583,8 @@ void Dlg_ExerciseModule::_setExerciseHand(int predict, int idx_prdt)
 
 void Dlg_ExerciseModule::_clearHintHand()
 {
-	_ucpNameSharedMem[15] = 1;
+	_ucpNameSharedMem[ByteDef::HINT_HAND_FINGER_RETURN_BYTE] = 1;
+	_ucpNameSharedMem[ByteDef::HINT_HAND_WRIST_RETURN_BYTE] = 1;
 }
 
 void Dlg_ExerciseModule::_initReturnActionCBBOX()

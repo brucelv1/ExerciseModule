@@ -24,8 +24,9 @@ public:
 	static const int HINT_HAND_MOVE_BYTE3 = 12;
 	static const int HINT_HAND_MOVE_BYTE2 = 13;
 	static const int HINT_HAND_MOVE_BYTE1 = 14;
-	static const int HINT_HAND_RETURN_BYTE = 15;
-	static const int HAND_HOLD_BYTE = 16;
+	static const int HINT_HAND_FINGER_RETURN_BYTE = 15;
+	static const int HINT_HAND_WRIST_RETURN_BYTE = 16;
+	static const int HAND_HOLD_BYTE = 17;
 };
 
 class Dlg_ExerciseModule : public QDialog, public Ui_ExerciseModule
