@@ -12,6 +12,22 @@
 #include <QtGui/QStandardItemModel>
 #include <QtGui/QStandardItem>
 
+// The definition of each byte of the shared memory
+class ByteDef
+{
+public:
+	static const int NUM_DECISION_BYTE = 7;
+	static const int DECISION_TYPE_BYTE = 8;
+	static const int FINGER_RETURN_COMMAND_BYTE = 9;
+	static const int HINT_HAND_MOVE_BYTE = 10;
+	static const int HINT_HAND_MOVE_BYTE4 = 11;
+	static const int HINT_HAND_MOVE_BYTE3 = 12;
+	static const int HINT_HAND_MOVE_BYTE2 = 13;
+	static const int HINT_HAND_MOVE_BYTE1 = 14;
+	static const int HINT_HAND_RETURN_BYTE = 15;
+	static const int HAND_HOLD_BYTE = 16;
+};
+
 class Dlg_ExerciseModule : public QDialog, public Ui_ExerciseModule
 {
 	Q_OBJECT
@@ -50,8 +66,7 @@ private:
 
 	// thread: get data, send command, ...
 	boost::thread _mThread;
-	// single action duration, in second, used in thread
-	// default: 6s
+	// single action duration, in second, used in thread, default 10 secs
 	size_t _mSingleDuration;
 
 	// Timer, for processing bar
@@ -70,14 +85,8 @@ private:
 	size_t _stLenSharedMem;
 
 	// Statistics
-	// 1 每个动作对应的总预测次数 <command, predict>
-	std::vector< std::pair<int, int> > _predictPerAction;
-	// 2 每个动作正确的预测次数
-	std::vector<int> _rightPrdtPerAction;
-	// 3 第一次预测正确对应的时间延迟
-	std::vector<int> _firstHitDelay;
-	// 4 第一次预测正确后，动作保持准确率
-	std::vector<float> _holdStability;
+	// 1 每个动作对应的完成时间 <command, completion_time>
+	std::vector< std::pair<int, double> > _completionTimePerAction;
 
 	// Table model
 	QStandardItemModel* _tableModel;
@@ -108,11 +117,13 @@ public slots:
 	void on_BtnCreateClassifier_clicked();
 	void on_BtnSaveClassifier_clicked();
 	void on_Btn_Connect_clicked();
-	void on_Btn_StartExercise_clicked(); // Test
+	void on_Btn_StartExercise_clicked();
 	void on_Btn_CreateReport_clicked();
 	void on_BtnExportReport_clicked();
 	void on_Btn_ApplyFingerReturn_clicked();
 	
+	// Test
+	void on_Btn_test_clicked();
 
 private slots:
 	void _qTimer_timeout();

@@ -78,12 +78,14 @@ public:
     QHBoxLayout *horizontalLayout_6;
     QPushButton *Btn_CreateReport;
     QPushButton *BtnExportReport;
+    QSpinBox *spinTest;
+    QPushButton *Btn_test;
 
     void setupUi(QDialog *ExerciseModule)
     {
         if (ExerciseModule->objectName().isEmpty())
             ExerciseModule->setObjectName(QString::fromUtf8("ExerciseModule"));
-        ExerciseModule->resize(525, 550);
+        ExerciseModule->resize(533, 628);
         ExerciseModule->setMinimumSize(QSize(525, 550));
         ExerciseModule->setMaximumSize(QSize(10000, 10000));
         horizontalLayout_13 = new QHBoxLayout(ExerciseModule);
@@ -331,6 +333,17 @@ public:
 
         verticalLayout_2->addWidget(groupBox_3);
 
+        spinTest = new QSpinBox(ExerciseModule);
+        spinTest->setObjectName(QString::fromUtf8("spinTest"));
+        spinTest->setMaximum(9999999);
+
+        verticalLayout_2->addWidget(spinTest);
+
+        Btn_test = new QPushButton(ExerciseModule);
+        Btn_test->setObjectName(QString::fromUtf8("Btn_test"));
+
+        verticalLayout_2->addWidget(Btn_test);
+
         verticalLayout_2->setStretch(0, 1);
         verticalLayout_2->setStretch(1, 1);
         verticalLayout_2->setStretch(2, 1);
@@ -377,11 +390,12 @@ public:
         label_3->setText(QApplication::translate("ExerciseModule", "\346\257\217\344\270\252\345\212\250\344\275\234\351\207\215\345\244\215\346\254\241\346\225\260", 0, QApplication::UnicodeUTF8));
         label_4->setText(QApplication::translate("ExerciseModule", "\346\234\200\345\244\247\345\260\235\350\257\225\346\227\266\351\227\264\357\274\232\347\247\222", 0, QApplication::UnicodeUTF8));
         label_5->setText(QApplication::translate("ExerciseModule", "\350\256\276\345\256\232\345\244\215\344\275\215\345\212\250\344\275\234\357\274\232", 0, QApplication::UnicodeUTF8));
-        Btn_ApplyFingerReturn->setText(QApplication::translate("ExerciseModule", "\345\272\224\347\224\250", 0, QApplication::UnicodeUTF8));
+        Btn_ApplyFingerReturn->setText(QApplication::translate("ExerciseModule", "\351\200\211\346\213\251\350\257\245\345\212\250\344\275\234", 0, QApplication::UnicodeUTF8));
         Btn_StartExercise->setText(QApplication::translate("ExerciseModule", "\345\274\200\345\247\213\347\273\203\344\271\240", 0, QApplication::UnicodeUTF8));
         groupBox_3->setTitle(QApplication::translate("ExerciseModule", "\346\234\254\346\254\241\347\273\203\344\271\240\346\212\245\345\221\212", 0, QApplication::UnicodeUTF8));
         Btn_CreateReport->setText(QApplication::translate("ExerciseModule", "\347\224\237\346\210\220\346\212\245\345\221\212", 0, QApplication::UnicodeUTF8));
         BtnExportReport->setText(QApplication::translate("ExerciseModule", "\345\257\274\345\207\272\346\212\245\345\221\212", 0, QApplication::UnicodeUTF8));
+        Btn_test->setText(QApplication::translate("ExerciseModule", "do", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 
 };

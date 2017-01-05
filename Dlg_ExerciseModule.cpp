@@ -18,7 +18,7 @@ Dlg_ExerciseModule::Dlg_ExerciseModule(unsigned char* nameSharedMem, size_t lenS
 	, _ucpNameSharedMem(nameSharedMem)
 	, _stLenSharedMem(lenSharedMem)
 	, _tableModel(new QStandardItemModel(this))
-	, _mSingleDuration(6)
+	, _mSingleDuration(10)
 {
 	setupUi(this);
 	_initTableView();
@@ -94,10 +94,7 @@ void Dlg_ExerciseModule::_threadSend( Dlg_ExerciseModule* dtm, std::vector<int> 
 		
 		// statistics
 		int cnt = 0;
-		int right = 0;
-		int firstHit = 0;
-		bool has1stHit = false;
-		int rightAfterFirst = 0;
+		double completionTime = 1000;
 
 		// sampling, wait for duration
 		t1 = steady_clock::now();
@@ -117,15 +114,6 @@ void Dlg_ExerciseModule::_threadSend( Dlg_ExerciseModule* dtm, std::vector<int> 
 				int predict = dtm->_mClassifier->Predict(dtm->_armBandData);
 				
 				cnt++;
-				/*if (predict == command)
-				{
-					if (has1stHit==false)
-					{
-						firstHit = cnt;
-						has1stHit = true;
-					}
-					right++;
-				}*/
 				dtm->_setExerciseHand(predict, cnt);
 
 				dtm->_armBandData.clear();
@@ -137,22 +125,33 @@ void Dlg_ExerciseModule::_threadSend( Dlg_ExerciseModule* dtm, std::vector<int> 
 			t2 = steady_clock::now();
 			time_span = duration_cast<duration<double> > (t2-t1);
 			sampleIdx+=1;
+
+			
 			// update main module
 			main_module_processing = 100 * time_span.count() / dtm->_mSingleDuration;
 			dtm->_ucpNameSharedMem[6] = main_module_processing;
+
+
+			// 检查“重合”flag，若为1，记录当前所耗的时间time_span.count()，然后立即跳出
+			if (dtm->_ucpNameSharedMem[ByteDef::HAND_HOLD_BYTE]==1)
+			{
+				dtm->_ucpNameSharedMem[ByteDef::HAND_HOLD_BYTE] = 0;
+				completionTime = time_span.count();
+				break;
+			}
+
 		} while (time_span.count() < dtm->_mSingleDuration);
 
-		std::cout << "count: " << cnt << "   ";
-		std::cout << "rate: " << right*1.0 / cnt << std::endl;
-
-		// statistics
-		dtm->_predictPerAction.push_back(std::make_pair(command, cnt));
-		dtm->_rightPrdtPerAction.push_back(right);
-		dtm->_firstHitDelay.push_back((firstHit-1)*winLength);
-		dtm->_holdStability.push_back(right*1.0/(cnt-firstHit+1));
 		
+		//statistics
+		dtm->_completionTimePerAction.push_back(std::make_pair(command, completionTime));
+		std::cout << "Completion Time (sec): " << completionTime << std::endl;
+		
+
+		// local processing bar
 		progress+=1;
 		dtm->processingBarVal = 100*progress/total_num;
+		
 	}
 
 	// after test series, let hint hand get back to REST position
@@ -162,9 +161,9 @@ void Dlg_ExerciseModule::_threadSend( Dlg_ExerciseModule* dtm, std::vector<int> 
 
 void Dlg_ExerciseModule::_qTimer_timeout()
 {
-	//progressBar->setValue(processingBarVal);
-	////std::cout << "process: " << _ucpNameSharedMem[6] << std::endl;
-	////progressBar->setValue(_ucpNameSharedMem[6]);
+	progressBar->setValue(processingBarVal);
+	//std::cout << "process: " << _ucpNameSharedMem[6] << std::endl;
+	//progressBar->setValue(_ucpNameSharedMem[6]);
 }
 
 void Dlg_ExerciseModule::on_BtnOpenPlugin_clicked()
@@ -372,10 +371,7 @@ void Dlg_ExerciseModule::on_Btn_StartExercise_clicked()
 	std::random_shuffle(testSeries.begin(), testSeries.end());
 
 	// clear statistics
-	_predictPerAction.clear();
-	_rightPrdtPerAction.clear();
-	_firstHitDelay.clear();
-	_holdStability.clear();
+	_completionTimePerAction.clear();
 
 	// start testing thread
 	_mThread = boost::thread(boost::bind(&(Dlg_ExerciseModule::_threadSend),this,testSeries));
@@ -383,12 +379,85 @@ void Dlg_ExerciseModule::on_Btn_StartExercise_clicked()
 
 void Dlg_ExerciseModule::on_Btn_CreateReport_clicked()
 {
+	if (_completionTimePerAction.empty())
+	{
+		return;
+	}
 
+	// clear table first
+	int nRow = _tableModel->rowCount();
+	for (int i=nRow-1;i>=0;i--)
+	{
+		_tableModel->removeRow(i);
+	}
+
+	// then fill the table
+	for (size_t i=0; i<_completionTimePerAction.size(); i++)
+	{
+		// name
+		int command = _completionTimePerAction[i].first;
+		std::string name = "";
+		for (size_t j=0; j<_commandVec.size(); j++)
+		{
+			if(_commandVec[j]->Command == command)
+			{
+				name = _commandVec[j]->Name;
+				break;
+			}
+		}
+		_tableModel->setItem(i,0,new QStandardItem(QString(name.c_str())));
+
+		// Completion Time, minus 2 means holding time.
+		double c_t = _completionTimePerAction[i].second - 2;
+		char buff[20];
+		sprintf_s(buff,"%.4f", c_t);
+		QString crct = QString(buff);
+		_tableModel->setItem(i,1,new QStandardItem(crct));
+	}
 }
 
 void Dlg_ExerciseModule::on_BtnExportReport_clicked()
 {
+	QString filename = QFileDialog::getSaveFileName(this,
+		tr("Save Report"),
+		"",
+		tr("Report Files (*.txt)")
+		);
 
+	std::ofstream savefile(filename.toStdString());
+
+	// header
+	savefile << std::setiosflags(std::ios::left) << std::setw(20) << "Item";
+	savefile << std::setiosflags(std::ios::left) << std::setw(20) << "Action";
+	savefile << std::setiosflags(std::ios::left) << std::setw(20) << "Completion Time (s)";
+	savefile << std::endl;
+
+	for (size_t i=0; i<_completionTimePerAction.size(); i++)
+	{
+		savefile << std::setw(20) << i+1;
+		// name
+		int command = _completionTimePerAction[i].first;
+		std::string name = "";
+		for (size_t j=0; j<_commandVec.size(); j++)
+		{
+			if(_commandVec[j]->Command == command)
+			{
+				name = _commandVec[j]->Name;
+				break;
+			}
+		}
+		savefile << std::setiosflags(std::ios::left) << std::setw(20) << name;
+
+		// Completion Time
+		double c_t = _completionTimePerAction[i].second - 2;
+		char buff[20];
+		sprintf_s(buff,"%.4f", c_t);
+		savefile << std::setiosflags(std::ios::left) << std::setw(20) << std::string(buff);
+
+		// last line no linefeed
+		if(i != _completionTimePerAction.size()-1)
+			savefile << std::endl;
+	}
 }
 
 
@@ -471,9 +540,7 @@ void Dlg_ExerciseModule::_parseTrainConfig()
 void Dlg_ExerciseModule::_initTableView()
 {
 	_tableModel->setHorizontalHeaderItem(0,new QStandardItem("Action"));
-	_tableModel->setHorizontalHeaderItem(1,new QStandardItem("Correctness"));
-	_tableModel->setHorizontalHeaderItem(2,new QStandardItem("First Hit Delay"));
-	_tableModel->setHorizontalHeaderItem(3,new QStandardItem("Stability"));
+	_tableModel->setHorizontalHeaderItem(1,new QStandardItem("Completion Time (sec)"));
 
 	// bind the model with the view
 	tbView_Report->setModel(_tableModel);
@@ -538,4 +605,12 @@ void Dlg_ExerciseModule::_initReturnActionCBBOX()
 	{
 		cbBoxReturnAction->addItem(QString(actions[i].c_str()));
 	}
+}
+
+void Dlg_ExerciseModule::on_Btn_test_clicked()
+{
+	int cmd = spinTest->value();
+	static int idx_prdt = 0;
+	_setExerciseHand(cmd,idx_prdt);
+	idx_prdt++;
 }
