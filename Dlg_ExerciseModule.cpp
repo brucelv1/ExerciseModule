@@ -19,6 +19,7 @@ Dlg_ExerciseModule::Dlg_ExerciseModule(unsigned char* nameSharedMem, size_t lenS
 	, _stLenSharedMem(lenSharedMem)
 	, _tableModel(new QStandardItemModel(this))
 	, _mSingleDuration(10)
+	, _fingerReturn(0)
 {
 	setupUi(this);
 	_initTableView();
@@ -343,8 +344,8 @@ void Dlg_ExerciseModule::on_Btn_ApplyFingerReturn_clicked()
 	{
 		if(_commandVec[i]->Name == action.toStdString())
 		{
-			unsigned char cmd = _commandVec[i]->Command % 256;
-			_ucpNameSharedMem[ByteDef::FINGER_RETURN_COMMAND_BYTE] = cmd;
+			_fingerReturn = _commandVec[i]->Command % 256;
+			_ucpNameSharedMem[ByteDef::FINGER_RETURN_COMMAND_BYTE] = _fingerReturn;
 		}
 	}
 }
@@ -363,11 +364,11 @@ void Dlg_ExerciseModule::on_Btn_StartExercise_clicked()
 	std::vector<int> testSeries;
 
 	std::vector<int> classLabel = _mClassifier->GetClassVector();
-	// remove REST
+	// remove REST and FINGER_RETURN
 	std::vector<int> noREST;
 	for (size_t i=0; i<classLabel.size(); i++)
 	{
-		if(classLabel[i] != 0)
+		if(classLabel[i] != 0 && classLabel[i] != _fingerReturn)
 			noREST.push_back(classLabel[i]);
 	}
 

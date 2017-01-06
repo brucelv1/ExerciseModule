@@ -92,6 +92,9 @@ private:
 	// Table model
 	QStandardItemModel* _tableModel;
 
+	// finger action return command
+	unsigned char _fingerReturn;
+
 public:
 	Dlg_ExerciseModule(unsigned char* nameSharedMem, size_t lenSharedMem, QWidget* parent = NULL);
 	~Dlg_ExerciseModule();
