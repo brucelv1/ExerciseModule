@@ -49,6 +49,7 @@ void Dlg_ExerciseModule::_threadSend( Dlg_ExerciseModule* dtm, std::vector<int> 
 
 	// counting
 	int progress = 0;
+	// total number of actions
 	int total_num = testSeries.size();
 	
 	// testing series
@@ -362,10 +363,17 @@ void Dlg_ExerciseModule::on_Btn_StartExercise_clicked()
 	std::vector<int> testSeries;
 
 	std::vector<int> classLabel = _mClassifier->GetClassVector();
+	// remove REST
+	std::vector<int> noREST;
+	for (size_t i=0; i<classLabel.size(); i++)
+	{
+		if(classLabel[i] != 0)
+			noREST.push_back(classLabel[i]);
+	}
 
 	for(int i=1; i<=spinB_ActionTimes->value(); i++)
 	{
-		testSeries.insert(testSeries.end(), classLabel.begin(), classLabel.end());
+		testSeries.insert(testSeries.end(), noREST.begin(), noREST.end());
 	}
 	// shuffle
 	std::random_shuffle(testSeries.begin(), testSeries.end());
